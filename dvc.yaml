@@ -1,0 +1,17 @@
+stages:
+  ingest:
+    cmd: python src/ingestion.py
+    deps:
+      - src/ingestion.py
+      - data/external/train.csv
+    outs:
+      - data/raw/
+
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/raw/
+      - data/external/store.csv
+    outs:
+      - data/processed/processed_sales.csv

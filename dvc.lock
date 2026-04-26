@@ -1,0 +1,40 @@
+schema: '2.0'
+stages:
+  ingest:
+    cmd: python src/ingestion.py
+    deps:
+    - path: data/external/train.csv
+      hash: md5
+      md5: d47aedd9e2d580e06a6ef7ce1732e8b6
+      size: 38057952
+    - path: src/ingestion.py
+      hash: md5
+      md5: 0032f46ad3d668ea6268c8826478ccd9
+      size: 2223
+    outs:
+    - path: data/raw/
+      hash: md5
+      md5: 21783d1d4b673d3858d49703fa7f31dd.dir
+      size: 33609
+      nfiles: 2
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/external/store.csv
+      hash: md5
+      md5: 30c9ccb5af66c21f65e7d1da967e6251
+      size: 45010
+    - path: data/raw/
+      hash: md5
+      md5: 21783d1d4b673d3858d49703fa7f31dd.dir
+      size: 33609
+      nfiles: 2
+    - path: src/preprocess.py
+      hash: md5
+      md5: fc9f90bf7b79b98bbefd76bbb0122a66
+      size: 3793
+    outs:
+    - path: data/processed/processed_sales.csv
+      hash: md5
+      md5: a05d8de5f29816067a98ce4c09cde788
+      size: 1368
