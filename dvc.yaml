@@ -5,7 +5,8 @@ stages:
       - src/ingestion.py
       - data/external/train.csv
     outs:
-      - data/raw/
+      - data/raw/:
+          persist: true
 
   preprocess:
     cmd: python src/preprocess.py
