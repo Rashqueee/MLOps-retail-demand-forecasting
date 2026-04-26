@@ -1,9 +1,11 @@
 import pandas as pd
 import os
 
+
 SOURCE_DATA_PATH = '../data/external/train.csv'
 RAW_DATA_PATH = '../data/raw/daily_sales.csv'
 TRACKER_FILE = '../data/raw/ingestion_tracker.txt'
+
 
 def get_next_date(source_df, last_date):
     future_dates = source_df[source_df['Date'] > last_date]['Date'].unique()
@@ -47,6 +49,7 @@ def ingestion():
         f.write(next_date.strftime('%Y-%m-%d'))
         
     print(f"Berhasil menyimpan {len(daily_data)} baris transaksi ke {RAW_DATA_PATH}")
+
 
 if __name__ == "__main__":
     ingestion()

@@ -1,5 +1,4 @@
-data/raw/*
-data/external/*
+data/*
 models/*
 notebooks/*
 __pycache__/
