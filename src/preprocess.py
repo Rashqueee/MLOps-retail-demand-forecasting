@@ -5,14 +5,14 @@ from sklearn.preprocessing import LabelEncoder
 import glob
 
 
-STORE_DATA_PATH = '../data/external/store.csv'
-PROCESSED_DATA_PATH = '../data/processed/processed_sales.csv'
+STORE_DATA_PATH = 'data/external/store.csv'
+PROCESSED_DATA_PATH = 'data/processed/processed_sales.csv'
 
 
 def preprocess_data():
     print("Memulai proses data preprocessing ...")
     
-    list_of_files = glob.glob('../data/raw/sales_*.csv')
+    list_of_files = glob.glob('data/raw/sales_*.csv')
     latest_file = max(list_of_files, key=os.path.getctime)
         
     print("Memuat data terbaru ({latest_file})...")

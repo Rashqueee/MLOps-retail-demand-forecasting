@@ -1,7 +1,41 @@
-data/*
-models/*
-notebooks/*
+# ==========================================
+# 1. DVC SYSTEM
+# ==========================================
+/.dvc/cache/
+/.dvc/tmp/
+/.dvc/config.local
+
+# ==========================================
+# 2. DATA & MODEL 
+# ==========================================
+/data/raw/
+/data/processed/
+/data/external/*.csv
+/models/
+
+# ==========================================
+# 3. PYTHON ENVIRONMENT & CACHE
+# ==========================================
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+.env
+
+mlops_env/
+venv/
+env/
+.conda/
+
+# ==========================================
+# 4. IDE & OS FILES
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# 5. JUPYTER NOTEBOOKS & EXPERIMENTS
+# ==========================================
+/notebooks/
+.ipynb_checkpoints/

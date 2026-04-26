@@ -2,9 +2,9 @@ import pandas as pd
 import os
 
 
-SOURCE_DATA_PATH = '../data/external/train.csv'
-RAW_DATA_DIR = '../data/raw/'
-TRACKER_FILE = '../data/raw/ingestion_tracker.txt'
+SOURCE_DATA_PATH = 'data/external/train.csv'
+RAW_DATA_DIR = 'data/raw/'
+TRACKER_FILE = 'data/raw/ingestion_tracker.txt'
 
 
 def get_next_date(source_df, last_date):
@@ -51,6 +51,9 @@ def ingestion():
     # Penamaan file dengan timestamp
     file_timestamp = next_date.strftime('%Y-%m-%d')
     raw_path = os.path.join(RAW_DATA_DIR, f'sales_{file_timestamp}.csv')
+    
+    # Membuat folder jika belum ada
+    os.makedirs(RAW_DATA_DIR, exist_ok=True)
     
     # Simpan sebagai file baru
     accumulated_data.to_csv(raw_path, index=False)
