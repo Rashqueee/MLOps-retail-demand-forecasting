@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 from sklearn.preprocessing import LabelEncoder
+import glob
 
 
-RAW_DATA_PATH = '../data/raw/daily_sales.csv'
 STORE_DATA_PATH = '../data/external/store.csv'
 PROCESSED_DATA_PATH = '../data/processed/processed_sales.csv'
 
@@ -12,12 +12,11 @@ PROCESSED_DATA_PATH = '../data/processed/processed_sales.csv'
 def preprocess_data():
     print("Memulai proses data preprocessing ...")
     
-    if not os.path.exists(RAW_DATA_PATH):
-        print(f"Error: File {RAW_DATA_PATH} tidak ditemukan.")
-        return
+    list_of_files = glob.glob('../data/raw/sales_*.csv')
+    latest_file = max(list_of_files, key=os.path.getctime)
         
-    print("Memuat data...")
-    df_train = pd.read_csv(RAW_DATA_PATH, low_memory=False)
+    print("Memuat data terbaru ({latest_file})...")
+    df_train = pd.read_csv(latest_file, low_memory=False)
     df_store = pd.read_csv(STORE_DATA_PATH, low_memory=False)
     
     # Hapus kolom Customers untuk mencegah data leakage

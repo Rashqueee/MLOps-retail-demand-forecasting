@@ -3,7 +3,7 @@ import os
 
 
 SOURCE_DATA_PATH = '../data/external/train.csv'
-RAW_DATA_PATH = '../data/raw/daily_sales.csv'
+RAW_DATA_DIR = '../data/raw/'
 TRACKER_FILE = '../data/raw/ingestion_tracker.txt'
 
 
@@ -23,12 +23,16 @@ def ingestion():
     source_df = pd.read_csv(SOURCE_DATA_PATH, low_memory=False)
     source_df['Date'] = pd.to_datetime(source_df['Date'])
     
+    # Tentukan tanggal mulai dataset untuk pengambilan pertama kali
+    first_date_in_data = source_df['Date'].min()
+
     if os.path.exists(TRACKER_FILE):
         with open(TRACKER_FILE, 'r') as f:
             last_date_str = f.read().strip()
             last_date = pd.to_datetime(last_date_str)
     else:
-        last_date = source_df['Date'].min() - pd.Timedelta(days=1)
+        # Jika pertama kali run, anggap belum ada data yang diambil
+        last_date = first_date_in_data - pd.Timedelta(days=1)
         
     next_date = get_next_date(source_df, last_date)
     
@@ -38,17 +42,24 @@ def ingestion():
         
     print(f"Menarik data untuk tanggal: {next_date.strftime('%Y-%m-%d')}")
     
-    daily_data = source_df[source_df['Date'] == next_date]
+    # Ambil semua data dari tanggal paling awal hingga sekarang
+    accumulated_data = source_df[
+        (source_df['Date'] >= first_date_in_data) & 
+        (source_df['Date'] <= next_date)
+    ]
     
-    if os.path.exists(RAW_DATA_PATH):
-        daily_data.to_csv(RAW_DATA_PATH, mode='a', header=False, index=False)
-    else:
-        daily_data.to_csv(RAW_DATA_PATH, mode='w', header=True, index=False)
-        
+    # Penamaan file dengan timestamp
+    file_timestamp = next_date.strftime('%Y-%m-%d')
+    raw_path = os.path.join(RAW_DATA_DIR, f'sales_{file_timestamp}.csv')
+    
+    # Simpan sebagai file baru
+    accumulated_data.to_csv(raw_path, index=False)
+
+    # Update tracker
     with open(TRACKER_FILE, 'w') as f:
         f.write(next_date.strftime('%Y-%m-%d'))
         
-    print(f"Berhasil menyimpan {len(daily_data)} baris transaksi ke {RAW_DATA_PATH}")
+    print(f"Berhasil menyimpan {len(accumulated_data)} baris transaksi ke {raw_path}")
 
 
 if __name__ == "__main__":
