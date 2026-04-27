@@ -4,18 +4,18 @@
 
 This project uses the **Rossmann Store Sales dataset** to simulate a real-world retail environment where sales patterns are influenced by promotions, holidays, and seasonal trends. 
 
-Moving beyond standard Jupyter Notebook experiments, this project implements a **production-ready MLOps pipeline** featuring automated data ingestion, preprocessing, model training, and **Data Version Control (DVC)** using Google Drive as remote storage.
+Moving beyond standard Jupyter Notebook experiments, this project implements a **production-ready MLOps pipeline** featuring automated data ingestion, preprocessing, model training, **Data Version Control (DVC)** for remote storage, and **MLflow** for robust experiment tracking.
 
 ## 📋 Project Overview & MLOps Pipeline
 
-The core of this project is a fully automated DVC pipeline (`dvc.yaml`) that simulates a real-world continual learning workflow:
+The core of this project integrates automated data workflows with independent experiment tracking:
 
 1. **Data Ingestion (`src/ingestion.py`)**
    Simulates daily streaming data by fetching chronological snapshots of historical sales data and saving them as versioned accumulated files with timestamps.
 2. **Feature Engineering & Preprocessing (`src/preprocess.py`)**
    Merges daily transactions with static store data, extracts crucial time-based features (e.g., `IsWeekend`, `IsPromoMonth`), handles missing values, and drops data-leaking features.
-3. **Model Training (`src/train.py`)**
-   Performs chronologically-aware time-series splitting to train an XGBoost Regressor. Saves the trained model and logs evaluation metrics (RMSE, MAE).
+3. **Model Training & Experiment Tracking (`src/train.py`)**
+   Performs chronologically-aware time-series splitting to train an XGBoost Regressor. Automatically logs hyperparameters, evaluation metrics (RMSE, MAPE), and model artifacts to **MLflow**.
 4. **Data Versioning (DVC)**
    Tracks multi-gigabyte datasets and models efficiently, storing the physical files in Google Drive while keeping the Git repository lightweight.
 
@@ -30,7 +30,7 @@ retail-demand-forecasting
 │  ├─ external/         # Raw, immutable source datasets (train.csv, store.csv)
 │  ├─ raw/              # Ingested daily snapshots (tracked by DVC)
 │  └─ processed/        # Cleaned and engineered data ready for training
-├─ metrics/             # Evaluation metrics (e.g., metrics.json)
+├─ mlruns/              # MLflow local tracking database & artifacts (ignored in Git)
 ├─ models/              # Compiled XGBoost models (.json)
 ├─ notebooks/           # Jupyter notebooks for EDA and prototyping
 ├─ src/                 # Pipeline source code
@@ -50,7 +50,9 @@ retail-demand-forecasting
 * **Pandas & NumPy** — Data manipulation and vectorization
 * **Scikit-learn** — Preprocessing and evaluation metrics
 * **DVC (Data Version Control)** — Data lineage, versioning, and pipeline orchestration
+* **MLflow** — Experiment tracking, metric logging, and model registry
 * **Git** — Source code version control
+
 
 ## 📦 Dataset
 
@@ -73,29 +75,41 @@ This project uses the **Rossmann Store Sales Dataset** from Kaggle.
 
 ## 🚀 How to Run the Pipeline
 
-Ensure you have installed the required dependencies, including DVC and its Google Drive extension:
+Ensure you have installed the required dependencies:
 ```bash
 pip install -r requirements.txt
-# Ensure dvc and dvc-gdrive are installed
-pip install dvc dvc-gdrive
 ```
 
-**Execute the full pipeline:**
-Thanks to DVC, running the entire workflow from data ingestion to model training requires only one command. DVC will intelligently skip stages that haven't changed.
+**1. Prepare the Data (DVC Pipeline):**
+Run the data ingestion and preprocessing stages using DVC. It will intelligently process only what has changed.
 ```bash
 dvc repro
 ```
+*(Note: Use `dvc repro --force` if you want to simulate fetching the next day's data without code changes).*
 
-**Sync data to Cloud Storage:**
+**2. Train the Model & Track Experiments (MLflow):**
+Execute the training script manually to allow for rapid hyperparameter tuning and tracking in MLflow.
+```bash
+python src/train.py
+```
+
+**3. Sync Data to Cloud Storage:**
+Back up your data versions and final model to the configured DVC remote (Google Drive).
 ```bash
 dvc push
 ```
 
+**4. View MLflow Experiment Dashboard:**
+To view the logged parameters, metrics, and compare runs, start the MLflow UI:
+```bash
+mlflow ui
+```
+Then, open `http://127.0.0.1:5000` in your browser.
+
 ## 🔄 Future Work
 
 Planned improvements for this project include:
-* Implementing **Hyperparameter Tuning** via Optuna/GridSearch.
-* Adding **MLflow** for robust experiment tracking and model registry.
+* Implementing **automated hyperparameter tuning** via Optuna.
 * Implementing **data drift detection** for production monitoring.
 * Building a **Streamlit prediction dashboard**.
 * Containerizing the application using **Docker**.
