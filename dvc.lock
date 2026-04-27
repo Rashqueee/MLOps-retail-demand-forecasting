@@ -14,9 +14,9 @@ stages:
     outs:
     - path: data/raw/
       hash: md5
-      md5: 1b8ac58514132aebe0a6a9c762d93051.dir
-      size: 560228
-      nfiles: 6
+      md5: 4d54d7db8f2f7043683a1a9ee2a200bb.dir
+      size: 3983883
+      nfiles: 15
   preprocess:
     cmd: python src/preprocess.py
     deps:
@@ -26,9 +26,9 @@ stages:
       size: 45010
     - path: data/raw/
       hash: md5
-      md5: 1b8ac58514132aebe0a6a9c762d93051.dir
-      size: 560228
-      nfiles: 6
+      md5: 4d54d7db8f2f7043683a1a9ee2a200bb.dir
+      size: 3983883
+      nfiles: 15
     - path: src/preprocess.py
       hash: md5
       md5: fc9f90bf7b79b98bbefd76bbb0122a66
@@ -36,5 +36,5 @@ stages:
     outs:
     - path: data/processed/processed_sales.csv
       hash: md5
-      md5: 2b526c7a659a7dcf654d8b6470701db2
-      size: 303458
+      md5: 9a2ad4ccec5bef2a5bcebc818d5e7a58
+      size: 838017
