@@ -39,3 +39,14 @@ Thumbs.db
 # ==========================================
 /notebooks/
 .ipynb_checkpoints/
+
+# ==========================================
+# 6. EXPERIMENT TRACKING (MLflow)
+# ==========================================
+# Abaikan folder log dan artefak lokal MLflow
+mlruns/
+.trash/
+
+# Abaikan database lokal MLflow (jika menggunakan backend SQLite)
+mlflow.db
+*.db
