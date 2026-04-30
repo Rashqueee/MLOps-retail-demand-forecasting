@@ -45,13 +45,13 @@ def train_model():
     mlflow.set_experiment("Retail_Demand_Forecasting")
     
     # Mulai pencatatan eksperimen
-    with mlflow.start_run(run_name="Run#1"):
+    with mlflow.start_run(run_name="Run#5"):
         
         # Definisikan Hyperparameter
         params = {
-            'n_estimators': 50,
+            'n_estimators': 200,
             'learning_rate': 0.05,
-            'max_depth': 4,
+            'max_depth': 8,
             'random_state': 42,
             'objective': 'reg:squarederror',
             'enable_categorical': True
