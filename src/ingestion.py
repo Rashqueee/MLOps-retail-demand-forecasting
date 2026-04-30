@@ -8,10 +8,21 @@ TRACKER_FILE = 'data/raw/ingestion_tracker.txt'
 
 
 def get_next_date(source_df, last_date):
-    future_dates = source_df[source_df['Date'] > last_date]['Date'].unique()
-    if len(future_dates) == 0:
+    max_date = source_df['Date'].max()
+
+    # Jika tanggal terakhir sudah mencapai atau melewati batas akhir data, kembalikan None
+    if last_date >= max_date:
         return None
-    return future_dates.min()
+    
+    # Tambah 1 bulan ke depan dari tanggal terakhir
+    next_date = last_date + pd.offsets.MonthEnd(1)
+    
+    # Jika loncatan 1 bulan melewati data terakhir yang tersedia, batasi di max_date
+    if next_date > max_date:
+        return max_date
+        
+    return next_date
+    
 
 def ingestion():
     print("Memulai proses data ingestion ...")
@@ -40,7 +51,7 @@ def ingestion():
         print("Semua data sudah habis di-ingest!")
         return
         
-    print(f"Menarik data untuk tanggal: {next_date.strftime('%Y-%m-%d')}")
+    print(f"Menarik data dari {first_date_in_data.strftime('%Y-%m-%d')} hingga {next_date.strftime('%Y-%m-%d')}")
     
     # Ambil semua data dari tanggal paling awal hingga sekarang
     accumulated_data = source_df[
