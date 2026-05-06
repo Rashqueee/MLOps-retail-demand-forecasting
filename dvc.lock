@@ -14,9 +14,9 @@ stages:
     outs:
     - path: data/raw/
       hash: md5
-      md5: d2bdecb66c7be52b6019749b649a29f3.dir
-      size: 122082234
-      nfiles: 15
+      md5: 806d7acb804f8b073670742a4f0c4b44.dir
+      size: 139542078
+      nfiles: 16
   preprocess:
     cmd: python src/data/preprocess.py
     deps:
@@ -26,9 +26,9 @@ stages:
       size: 45010
     - path: data/raw/
       hash: md5
-      md5: d2bdecb66c7be52b6019749b649a29f3.dir
-      size: 122082234
-      nfiles: 15
+      md5: 806d7acb804f8b073670742a4f0c4b44.dir
+      size: 139542078
+      nfiles: 16
     - path: src/data/preprocess.py
       hash: md5
       md5: 4d8581ca2400f39dbdd37ca87441a7c9
@@ -36,5 +36,21 @@ stages:
     outs:
     - path: data/processed/processed_sales.csv
       hash: md5
-      md5: eab73998e211ec2c431b7426fd09d96a
-      size: 30211244
+      md5: 8f18837861e6944c850811d9bbc3c053
+      size: 32443129
+  train:
+    cmd: python src/models/train.py
+    deps:
+    - path: data/processed/processed_sales.csv
+      hash: md5
+      md5: 8f18837861e6944c850811d9bbc3c053
+      size: 32443129
+    - path: src/models/train.py
+      hash: md5
+      md5: f914b756299eed187c06fca792b33a47
+      size: 3901
+    outs:
+    - path: models/xgboost_sales_model.json
+      hash: md5
+      md5: 7cb678128cb3e0433e7817adb267ce35
+      size: 48967258

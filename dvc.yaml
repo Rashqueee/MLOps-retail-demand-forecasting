@@ -16,3 +16,11 @@ stages:
       - data/external/store.csv
     outs:
       - data/processed/processed_sales.csv
+  
+  train:
+    cmd: python src/models/train.py
+    deps:
+      - src/models/train.py
+      - data/processed/processed_sales.csv
+    outs:
+      - models/xgboost_sales_model.json

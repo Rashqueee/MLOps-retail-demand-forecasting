@@ -45,7 +45,7 @@ def train_model():
     mlflow.set_experiment("Retail_Demand_Forecasting")
     
     # Mulai pencatatan eksperimen
-    with mlflow.start_run(run_name="Run#5"):
+    with mlflow.start_run(run_name="Run#8"):
         
         # Definisikan Hyperparameter
         params = {
