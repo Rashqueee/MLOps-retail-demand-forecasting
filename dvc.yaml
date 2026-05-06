@@ -1,17 +1,17 @@
 stages:
   ingest:
-    cmd: python src/ingestion.py
+    cmd: python src/data/ingestion.py
     deps:
-      - src/ingestion.py
+      - src/data/ingestion.py
       - data/external/train.csv
     outs:
       - data/raw/:
           persist: true
 
   preprocess:
-    cmd: python src/preprocess.py
+    cmd: python src/data/preprocess.py
     deps:
-      - src/preprocess.py
+      - src/data/preprocess.py
       - data/raw/
       - data/external/store.csv
     outs:
