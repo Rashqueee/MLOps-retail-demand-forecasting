@@ -1,0 +1,5 @@
+outs:
+- md5: 7b8b59797a5e451a995e3b070a7899b4
+  size: 133
+  hash: md5
+  path: production_model_meta.json

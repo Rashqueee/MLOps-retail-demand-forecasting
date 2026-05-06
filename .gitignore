@@ -10,7 +10,7 @@
 # 2. DATA & MODEL 
 # ==========================================
 /data/raw/
-/data/processed/
+/data/processed/processed_sales.csv
 /data/external/*.csv
 /models/
 
