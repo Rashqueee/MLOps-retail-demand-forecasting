@@ -106,6 +106,20 @@ mlflow ui
 ```
 Then, open `http://127.0.0.1:5000` in your browser.
 
+
+## 🏷️ Model Registry & Inference
+
+This project uses **MLflow Model Registry** to manage the lifecycle of trained models. The best-performing model from our experiments is automatically registered, versioned, and transitioned through deployment stages (None -> Staging -> Production).
+
+**Currently Active Production Model:**
+* **Model Name:** `Rossmann_Sales_XGBoost`
+* **Stage:** `Production`
+* **Reason for Selection:** This version was selected programmatically as it yielded the lowest Mean Absolute Percentage Error (MAPE) during the hyperparameter tuning phase. It employs an optimized XGBoost architecture suitable for generalized time-series forecasting.
+
+**Inference Mechanism:**
+The inference pipeline dynamically fetches the model currently tagged as `Production` from the registry. Since the target variable (`Sales`) was log-transformed during training to handle skewness, the inference script automatically applies an inverse transformation (`np.expm1()`) to output the actual predicted sales volume.
+
+
 ## 🔄 Future Work
 
 Planned improvements for this project include:
