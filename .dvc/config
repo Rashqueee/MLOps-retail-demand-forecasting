@@ -2,3 +2,4 @@
     remote = gdrive_remote
 ['remote "gdrive_remote"']
     url = gdrive://1-vlg2F-gGYSUzDK_J912Ko_XNpjIr_Ol
+    gdrive_user_credentials_file = gdrive_new_token.json

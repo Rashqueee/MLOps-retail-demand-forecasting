@@ -4,6 +4,7 @@
 /.dvc/cache/
 /.dvc/tmp/
 /.dvc/config.local
+/.dvc/gdrive_new_token.json
 
 # ==========================================
 # 2. DATA & MODEL 
