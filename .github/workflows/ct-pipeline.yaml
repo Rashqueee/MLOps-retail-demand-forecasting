@@ -28,10 +28,9 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # - name: Pull Data from DVC
-      #   env:
-      #     GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-      #   run: dvc pull
+      - name: Download Data from Source
+        run: |
+          curl -L -o data/processed.csv "https://drive.google.com/uc?export=download&id=1Myln40AcUItP2mw5Wvr_ZIk3qz4HYTYw"
 
       - name: Run Model Training (Menciptakan Run Baru)
         env:
