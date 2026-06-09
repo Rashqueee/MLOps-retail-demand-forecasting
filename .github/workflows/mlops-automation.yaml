@@ -34,7 +34,7 @@ jobs:
         # kita buat data dummy agar script train.py bisa berjalan normal.
         run: |
           mkdir -p data/processed
-          cat <<EOF > data/processed/processed_tokopedia.csv
+          cat <<EOF > data/processed_tokopedia.csv
           Year,Month,Day,Hour,DayOfWeek,product_id,product_name,price,stock,rating,daily_demand
           2026,5,18,16,0,1,Bogasari,10000,50,5.0,2
           2026,5,18,17,0,1,Bogasari,10000,48,5.0,3

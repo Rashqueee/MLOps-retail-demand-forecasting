@@ -5,6 +5,7 @@ import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import mlflow
 import mlflow.xgboost
+import sys
 
 # Path konfigurasi
 PROCESSED_DATA_PATH = 'data/processed.csv'
@@ -16,7 +17,7 @@ def train_model():
     # Load Data Processed
     if not os.path.exists(PROCESSED_DATA_PATH):
         print(f"Error: Data {PROCESSED_DATA_PATH} tidak ditemukan.")
-        return
+        sys.exit(1)
         
     df = pd.read_csv(PROCESSED_DATA_PATH)
 
@@ -45,12 +46,12 @@ def train_model():
     mlflow.set_experiment("Retail_Demand_Forecasting")
     
     # Mulai pencatatan eksperimen
-    with mlflow.start_run(run_name="Run#4"):
+    with mlflow.start_run(run_name="Run#5"):
         
         # Definisikan Hyperparameter
         params = {
             'n_estimators': 200,
-            'learning_rate': 0.05,
+            'learning_rate': 0.1,
             'max_depth': 10,
             'random_state': 42,
             'objective': 'reg:squarederror',
