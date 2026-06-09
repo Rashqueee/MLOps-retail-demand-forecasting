@@ -28,19 +28,21 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Pull Data from DVC
-        env:
-          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-        run: dvc pull
+      # - name: Pull Data from DVC
+      #   env:
+      #     GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+      #   run: dvc pull
 
       - name: Run Model Training (Menciptakan Run Baru)
         env:
           MLFLOW_TRACKING_URI: file:./mlruns
+          MLFLOW_ALLOW_FILE_STORE: "true"
         run: |
           python src/train.py --run_name "Automated_CT_Run"
 
       - name: Comparative Evaluation & Model Promotion
         env:
           MLFLOW_TRACKING_URI: file:./mlruns
+          MLFLOW_ALLOW_FILE_STORE: "true"
         run: |
           python src/registry_manager.py

@@ -52,8 +52,8 @@ jobs:
 
       - name: 6. Stage 2 - Automated Training (train.py)
         env:
-          # Arahkan MLflow ke folder lokal agar tidak mencari localhost:5000
           MLFLOW_TRACKING_URI: file:./mlruns 
+          MLFLOW_ALLOW_FILE_STORE: "true"
         run: |
           python src/train.py --run_name "Automated_CT_Run"
 
