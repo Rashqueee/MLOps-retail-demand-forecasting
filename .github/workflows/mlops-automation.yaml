@@ -1,0 +1,52 @@
+name: MLOps End-to-End Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test-evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 2. Set up Python Environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 3. Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: 4. Stage 1 - Automated Unit Testing
+        run: |
+          pytest tests/
+
+      - name: 5. Generate Mock Data untuk CI/CD
+        # Karena GitHub server tidak bisa menarik data dari Google Drive lokal, 
+        # kita buat data dummy agar script train.py bisa berjalan normal.
+        run: |
+          mkdir -p data/processed
+          cat <<EOF > data/processed/processed_tokopedia.csv
+          Year,Month,Day,Hour,DayOfWeek,product_id,product_name,price,stock,rating,daily_demand
+          2026,5,18,16,0,1,Bogasari,10000,50,5.0,2
+          2026,5,18,17,0,1,Bogasari,10000,48,5.0,3
+          2026,5,19,10,1,2,BlueBand,9500,20,4.9,5
+          2026,5,19,11,1,2,BlueBand,9500,15,4.9,1
+          2026,5,20,12,2,3,UltraMilk,20000,10,4.8,8
+          EOF
+
+      - name: 6. Stage 2 - Automated Training (train.py)
+        run: |
+          python src/train.py
+
+      - name: 7. Stage 3 & 4 - Model Evaluation & Auto-Registry
+        run: |
+          python src/evaluate_model.py
