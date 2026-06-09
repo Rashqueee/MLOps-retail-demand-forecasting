@@ -1,53 +1,6 @@
-# ==========================================
-# 1. DVC SYSTEM
-# ==========================================
-/.dvc/cache/
-/.dvc/tmp/
-/.dvc/config.local
-/.dvc/gdrive_new_token.json
-
-# ==========================================
-# 2. DATA & MODEL 
-# ==========================================
-/data/raw/
-/data/processed/processed_sales.csv
-/data/external/*.csv
-/models/
-
-# ==========================================
-# 3. PYTHON ENVIRONMENT & CACHE
-# ==========================================
 __pycache__/
-*.py[cod]
-*$py.class
-.env
-
-mlops_env/
-venv/
-env/
-.conda/
-
-# ==========================================
-# 4. IDE & OS FILES
-# ==========================================
 .vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# ==========================================
-# 5. JUPYTER NOTEBOOKS & EXPERIMENTS
-# ==========================================
-/notebooks/
-.ipynb_checkpoints/
-
-# ==========================================
-# 6. EXPERIMENT TRACKING (MLflow)
-# ==========================================
-# Abaikan folder log dan artefak lokal MLflow
+notebooks/
 mlruns/
-.trash/
-
-# Abaikan database lokal MLflow (jika menggunakan backend SQLite)
 mlflow.db
-*.db
+.dvc/*.json

@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 import os
 import xgboost as xgb
-from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 import mlflow
 import mlflow.xgboost
 
 # Path konfigurasi
-PROCESSED_DATA_PATH = 'data/processed/processed_sales.csv'
+PROCESSED_DATA_PATH = 'data/processed.csv'
 MODEL_DIR = 'models/'
 
 def train_model():
@@ -20,32 +20,32 @@ def train_model():
         
     df = pd.read_csv(PROCESSED_DATA_PATH)
 
-    # Konversi kembali kolom Store menjadi tipe data 'category'
-    print("Mengonversi tipe data Store menjadi category...")
-    df['Store'] = df['Store'].astype('category')
+    # Konversi kolom Kategorikal untuk XGBoost
+    print("Mengonversi tipe data menjadi category...")
+    df['product_id'] = df['product_id'].astype('category')
+    df['product_name'] = df['product_name'].astype('category')
     
-    # Time Series Split (Sorting kronologis)
+    # Time Series Split (Sorting berdasarkan Waktu ekstraksi)
     print("Mempersiapkan data dan melakukan time-series split...")
-    df = df.sort_values(by=['Year', 'Month', 'Day'])
+    df = df.sort_values(by=['Year', 'Month', 'Day', 'Hour'])
     
-    X = df.drop(['Sales'], axis=1)
-    y = df['Sales']
+    # Target variabel sekarang adalah daily_demand
+    X = df.drop(['daily_demand'], axis=1)
+    y = df['daily_demand']
+
+    # PENCEGAHAN ERROR: Pastikan tidak ada nilai negatif akibat anomali scraping
+    y = y.clip(lower=0)
     
     # Split: 90% data awal untuk Train, 10% data terakhir untuk Validation
     split_index = int(len(df) * 0.90)
     X_train, X_valid = X.iloc[:split_index], X.iloc[split_index:]
     y_train, y_valid = y.iloc[:split_index], y.iloc[split_index:]
-    
-    # Log tranformation pada target 
-    print("Menerapkan transformasi logaritmik pada variabel target...")
-    y_train_log = np.log1p(y_train)
-    y_valid_log = np.log1p(y_valid)
 
-    # Inisialisasi Eksperimen MLflow (akan membuat folder mlruns/ jika dijalankan secara lokal)
+    # Inisialisasi Eksperimen MLflow
     mlflow.set_experiment("Retail_Demand_Forecasting")
     
     # Mulai pencatatan eksperimen
-    with mlflow.start_run(run_name="Run#8"):
+    with mlflow.start_run(run_name="Run#3"):
         
         # Definisikan Hyperparameter
         params = {
@@ -62,34 +62,30 @@ def train_model():
         for key, value in params.items():
             mlflow.log_param(key, value)
             
-        # Melatih Model XGBoost
+        # Melatih Model XGBoost (LANGSUNG menggunakan target asli)
         print("Sedang melatih model...")
         xgb_model = xgb.XGBRegressor(**params)
         
-        # Training menggunakan target yang sudah di-log
         xgb_model.fit(
-            X_train, y_train_log,
-            eval_set=[(X_train, y_train_log), (X_valid, y_valid_log)],
+            X_train, y_train,
+            eval_set=[(X_train, y_train), (X_valid, y_valid)],
             verbose=False # Matikan log bawaan XGBoost agar terminal tetap bersih
         )
         
-        # Prediksi dan Evaluasi
+        # Prediksi dan Evaluasi (Hasil langsung berupa angka target asli)
         print("Mengevaluasi model pada data validasi...")
-        y_pred_log = xgb_model.predict(X_valid) # Hasil prediksi masih dalam bentuk logaritmik
-        
-        # Kembalikan ke nilai asli (inverse transform) sebelum menghitung error
-        y_pred = np.expm1(y_pred_log)
+        y_pred = xgb_model.predict(X_valid)
 
         rmse = np.sqrt(mean_squared_error(y_valid, y_pred))
-        mape = mean_absolute_percentage_error(y_valid, y_pred)
+        mae = mean_absolute_error(y_valid, y_pred)
         
         # MLFlow mencatat metrik
         print("Mencatat metrik ke MLflow...")
         mlflow.log_metric("rmse", rmse)
-        mlflow.log_metric("mape", mape)
+        mlflow.log_metric("mae", mae)
         
         print(f"Validation RMSE: {rmse:.2f}")
-        print(f"Validation MAPE: {mape:.2%}") 
+        print(f"Validation MAE: {mae:.2f}") 
         
         # MLFlow mencatat model artefak
         print("Menyimpan model ke MLflow...")
@@ -97,7 +93,7 @@ def train_model():
         
         # Menyimpan model secara fisik untuk DVC Pipeline
         os.makedirs(MODEL_DIR, exist_ok=True)
-        local_model_path = os.path.join(MODEL_DIR, 'xgboost_sales_model.json')
+        local_model_path = os.path.join(MODEL_DIR, 'xgboost_model.json')
         xgb_model.save_model(local_model_path)
         
         print(f"Training Selesai! Model fisik tersimpan di {local_model_path} untuk DVC.")
