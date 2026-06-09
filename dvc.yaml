@@ -1,24 +1,24 @@
 stages:
   ingest:
-    cmd: python src/data/ingestion.py
+    cmd: python src/ingestion.py
     deps:
-      - src/data/ingestion.py
+      - src/ingestion.py
     outs:
       - data/raw.csv:
           persist: true
 
   preprocess:
-    cmd: python src/data/preprocess.py
+    cmd: python src/preprocess.py
     deps:
-      - src/data/preprocess.py
+      - src/preprocess.py
       - data/raw.csv
     outs:
       - data/processed.csv
   
   train:
-    cmd: python src/models/train.py
+    cmd: python src/train.py
     deps:
-      - src/models/train.py
+      - src/train.py
       - data/processed.csv
     outs:
       - models/xgboost_model.json

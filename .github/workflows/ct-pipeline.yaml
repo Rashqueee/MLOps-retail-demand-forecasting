@@ -1,0 +1,44 @@
+name: Continuous Training (CT) Pipeline
+
+on:
+  schedule:
+    # Skenario C: Retrain otomatis setiap hari Minggu jam 00:00 UTC
+    - cron: '0 0 * * 0'
+  repository_dispatch:
+    # Skenario A & B: Trigger Webhook dari Grafana Alerting (Simulasi)
+    types: [grafana-drift-alert]
+  workflow_dispatch:
+    # Tombol manual untuk testing di GitHub
+
+jobs:
+  continuous-training:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Pull Data from DVC
+        env:
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        run: dvc pull
+
+      - name: Run Model Training (Menciptakan Run Baru)
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5000 
+        run: |
+          python src/train.py --run_name "Automated_CT_Run"
+
+      - name: Comparative Evaluation & Model Promotion
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5000
+        run: |
+          python src/registry_manager.py

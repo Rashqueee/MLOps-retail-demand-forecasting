@@ -1,46 +1,46 @@
 schema: '2.0'
 stages:
   ingest:
-    cmd: python src/data/ingestion.py
+    cmd: python src/ingestion.py
     deps:
-    - path: src/data/ingestion.py
+    - path: src/ingestion.py
       hash: md5
       md5: 1819c3428357c16d448a3b172b104c28
       size: 8766
     outs:
     - path: data/raw.csv
       hash: md5
-      md5: 4015cdd6c763194a319ae2ec7efee20b
-      size: 28328
+      md5: 1026c57beb07bd4c61bd6e9081132af7
+      size: 28749
   preprocess:
-    cmd: python src/data/preprocess.py
+    cmd: python src/preprocess.py
     deps:
     - path: data/raw.csv
       hash: md5
-      md5: 4015cdd6c763194a319ae2ec7efee20b
-      size: 28328
-    - path: src/data/preprocess.py
+      md5: 1026c57beb07bd4c61bd6e9081132af7
+      size: 28749
+    - path: src/preprocess.py
       hash: md5
       md5: e8e409a660b8a460ef14dad6ce59a178
       size: 1848
     outs:
     - path: data/processed.csv
       hash: md5
-      md5: 55945e1cc66d52d5526c18981a1ad480
-      size: 26466
+      md5: e2ece37fab6d699bb3d0dc063bde51d0
+      size: 26857
   train:
-    cmd: python src/models/train.py
+    cmd: python src/train.py
     deps:
     - path: data/processed.csv
       hash: md5
-      md5: 55945e1cc66d52d5526c18981a1ad480
-      size: 26466
-    - path: src/models/train.py
+      md5: e2ece37fab6d699bb3d0dc063bde51d0
+      size: 26857
+    - path: src/train.py
       hash: md5
-      md5: f48c8ce6eb48d41889f7aae8117b1a57
-      size: 3679
+      md5: 19c73bc3e7c193df1a43f9b1b5b10a1f
+      size: 3959
     outs:
     - path: models/xgboost_model.json
       hash: md5
-      md5: 64ec0b0f27ac92bb50c1cb204da590d8
-      size: 369749
+      md5: a1f18ebf49b01570eee9363c1eefaceb
+      size: 955863

@@ -90,7 +90,7 @@ def train_model():
         signature = infer_signature(X_train, y_pred)
         
         print("Menyimpan model ke MLflow...")
-        mlflow.xgboost.log_model(xgb_model, "xgboost_model", signature=signature)
+        mlflow.xgboost.log_model(xgb_model, artifact_path="model", signature=signature)
         
         os.makedirs(MODEL_DIR, exist_ok=True)
         local_model_path = os.path.join(MODEL_DIR, 'xgboost_model.json')
