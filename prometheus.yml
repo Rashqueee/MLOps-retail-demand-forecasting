@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s # Seberapa sering mengambil data
+
+scrape_configs:
+  - job_name: 'fastapi-model-serving'
+    static_configs:
+      # Kita akan menargetkan semua replika api-service
+      - targets: ['api-service:8000']

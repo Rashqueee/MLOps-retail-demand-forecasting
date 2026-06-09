@@ -8,14 +8,24 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Histogram
 
 app = FastAPI(
     title="Tokopedia Retail Demand Forecasting API",
-    description="API untuk memprediksi demand harian produk menggunakan XGBoost dan MLflow Model Registry",
-    version="1.0"
+    description="API untuk memprediksi demand dengan Observability (Prometheus)",
+    version="1.1"
 )
 
-# Konfigurasi MLflow Tracking Server dari Environment Docker Compose
+Instrumentator().instrument(app).expose(app)
+
+# Inisialisasi Metrik Kustom untuk mendeteksi Data Drift (Pergeseran Distribusi Prediksi)
+PREDICTION_DISTRIBUTION = Histogram(
+    "model_prediction_value",
+    "Distribusi nilai prediksi demand untuk deteksi data drift",
+    buckets=[0, 1, 2, 3, 5, 10, 20, 50, 100]
+)
+
 TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 mlflow.set_tracking_uri(TRACKING_URI)
 
@@ -24,12 +34,8 @@ STAGE = "Production"
 model = None
 
 def load_production_model():
-    """Fungsi untuk memuat model berstatus Production dari MLflow dengan mekanisme retry"""
     global model
     model_uri = f"models:/{MODEL_NAME}/{STAGE}"
-    
-    # Mekanisme retry diperlukan karena saat docker-compose up, 
-    # API service bisa jadi siap lebih cepat daripada MLflow server selesai booting.
     for attempt in range(10):
         try:
             print(f"[{attempt+1}/10] Mencoba menarik model '{MODEL_NAME}' dari {TRACKING_URI}...")
@@ -37,18 +43,16 @@ def load_production_model():
             print("-> SUKSES: Model berhasil dimuat ke dalam memori API!")
             return
         except Exception as e:
-            print(f"-> GAGAL: Server MLflow belum siap atau model belum terdaftar. Mengulang dalam 5 detik...")
-            traceback.print_exc()
+            # Menampilkan error asli agar mudah di-debug jika gagal lagi
+            print(f"-> GAGAL (Alasan: {e}). Mengulang dalam 5 detik...")
             time.sleep(5)
             
     print("-> FATAL: API gagal memuat model setelah beberapa kali percobaan.")
 
 @app.on_event("startup")
 def startup_event():
-    """Dijalankan otomatis saat kontainer API dinyalakan"""
     load_production_model()
 
-# --- SKEMA INPUT DATA (VALIDASI PYDANTIC) ---
 class ProductFeature(BaseModel):
     Year: int
     Month: int
@@ -56,7 +60,7 @@ class ProductFeature(BaseModel):
     Hour: int
     DayOfWeek: int
     product_id: int
-    product_name: str
+    product_name: int
     price: int
     stock: int
     rating: float
@@ -64,41 +68,35 @@ class ProductFeature(BaseModel):
 class PredictionRequest(BaseModel):
     inputs: List[ProductFeature]
 
-# --- ENDPOINT API ---
-
 @app.get("/")
 def home():
-    return {
-        "status": "Online",
-        "message": "Welcome to Tokopedia Demand Forecasting API Service!",
-        "model_loaded": model is not None
-    }
+    return {"status": "Online", "model_loaded": model is not None}
 
 @app.post("/predict")
 def predict_demand(payload: PredictionRequest):
     global model
     if model is None:
-        raise HTTPException(status_code=503, detail="Model belum siap di memori server. Sila coba beberapa saat lagi.")
+        raise HTTPException(status_code=503, detail="Model belum siap.")
     
     try:
-        # 1. Konversi payload JSON menjadi Pandas DataFrame
         data_json = [item.dict() for item in payload.inputs]
         df_input = pd.DataFrame(data_json)
         
-        # 2. Proteksi & Penyesuaian Tipe Data Kategorikal (Wajib selaras dengan train.py)
-        df_input['product_id'] = df_input['product_id'].astype('category')
-        df_input['product_name'] = df_input['product_name'].astype('category')
+        ordered_columns = ['Year', 'Month', 'Day', 'Hour', 'DayOfWeek', 'product_id', 'product_name', 'price', 'stock', 'rating']
+        df_input = df_input[ordered_columns]
+
+        df_input['product_name'] = df_input['product_name'].astype(np.int32)
         
-        # 3. Eksekusi Prediksi
         predictions = model.predict(df_input)
         
-        # 4. Pasca-proses hasil prediksi (Menghapus nilai negatif & pembulatan)
         formatted_predictions = []
         for pred in predictions:
             clean_pred = max(0, round(pred))
             formatted_predictions.append(clean_pred)
             
-        # 5. Mengembalikan hasil sebagai response JSON
+            # Catat hasil prediksi ke Prometheus
+            PREDICTION_DISTRIBUTION.observe(clean_pred)
+            
         return {
             "status": "Success",
             "predictions": formatted_predictions
@@ -108,5 +106,4 @@ def predict_demand(payload: PredictionRequest):
         raise HTTPException(status_code=400, detail=f"Gagal memproses inferensi: {str(e)}")
 
 if __name__ == "__main__":
-    # Menjalankan uvicorn server secara lokal jika dieksekusi langsung via python src/main.py
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)

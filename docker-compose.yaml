@@ -19,9 +19,11 @@ services:
 
   api-service:
     build: .
-    container_name: demand_forecasting_api
+    image: mlflow-retail-api
     ports:
-      - "8000:8000"
+      - "8000-8002:8000"
+    deploy:
+      replicas: 3
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow-server:5000
     volumes:
@@ -29,6 +31,26 @@ services:
     depends_on:
       mlflow-server:
         condition: service_healthy
+    networks:
+      - mlops_network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - mlops_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
       - mlops_network
 

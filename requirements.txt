@@ -10,3 +10,5 @@ pytest
 uvicorn
 fastapi
 pydantic
+prometheus-fastapi-instrumentator
+prometheus-client
