@@ -1,6 +1,8 @@
 name: Continuous Training (CT) Pipeline
 
 on:
+  push:
+    branches: [ main ]
   schedule:
     # Skenario C: Retrain otomatis setiap hari Minggu jam 00:00 UTC
     - cron: '0 0 * * 0'
@@ -39,6 +41,6 @@ jobs:
 
       - name: Comparative Evaluation & Model Promotion
         env:
-          MLFLOW_TRACKING_URI: http://localhost:5000
+          MLFLOW_TRACKING_URI: file:./mlruns
         run: |
           python src/registry_manager.py
