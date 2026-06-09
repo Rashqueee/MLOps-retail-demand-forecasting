@@ -7,6 +7,8 @@ import mlflow
 import mlflow.xgboost
 import sys
 
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
+
 # Path konfigurasi
 PROCESSED_DATA_PATH = 'data/processed.csv'
 MODEL_DIR = 'models/'
@@ -46,11 +48,11 @@ def train_model():
     mlflow.set_experiment("Retail_Demand_Forecasting")
     
     # Mulai pencatatan eksperimen
-    with mlflow.start_run(run_name="Run#5"):
+    with mlflow.start_run(run_name="Run#6"):
         
         # Definisikan Hyperparameter
         params = {
-            'n_estimators': 200,
+            'n_estimators': 300,
             'learning_rate': 0.1,
             'max_depth': 10,
             'random_state': 42,

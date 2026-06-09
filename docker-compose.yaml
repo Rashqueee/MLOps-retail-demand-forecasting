@@ -1,0 +1,37 @@
+services:
+  mlflow-server:
+    image: python:3.10-slim
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns
+      - ./mlflow.db:/mlflow.db
+    command: bash -c "pip install mlflow && mlflow server --host 0.0.0.0 --port 5000 --allowed-hosts '*' --backend-store-uri sqlite:////mlflow.db --default-artifact-root /mlruns"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+    networks:
+      - mlops_network
+
+  api-service:
+    build: .
+    container_name: demand_forecasting_api
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+    volumes:
+      - ./mlruns:/mlruns
+    depends_on:
+      mlflow-server:
+        condition: service_healthy
+    networks:
+      - mlops_network
+
+networks:
+  mlops_network:
+    driver: bridge

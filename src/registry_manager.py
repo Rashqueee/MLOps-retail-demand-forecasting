@@ -1,6 +1,9 @@
+import os
 import mlflow
 from mlflow.tracking import MlflowClient
 import json
+
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
 
 def manage_model_registry():
     client = MlflowClient()
