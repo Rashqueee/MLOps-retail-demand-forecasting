@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Model Training (Menciptakan Run Baru)
         env:
-          MLFLOW_TRACKING_URI: http://localhost:5000 
+          MLFLOW_TRACKING_URI: file:./mlruns
         run: |
           python src/train.py --run_name "Automated_CT_Run"
 
