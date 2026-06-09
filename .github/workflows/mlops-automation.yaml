@@ -30,11 +30,9 @@ jobs:
           pytest tests/
 
       - name: 5. Generate Mock Data untuk CI/CD
-        # Karena GitHub server tidak bisa menarik data dari Google Drive lokal, 
-        # kita buat data dummy agar script train.py bisa berjalan normal.
         run: |
-          mkdir -p data/processed
-          cat <<EOF > data/processed_tokopedia.csv
+          mkdir -p data
+          cat <<EOF > data/processed.csv
           Year,Month,Day,Hour,DayOfWeek,product_id,product_name,price,stock,rating,daily_demand
           2026,5,18,16,0,1,Bogasari,10000,50,5.0,2
           2026,5,18,17,0,1,Bogasari,10000,48,5.0,3
@@ -42,6 +40,8 @@ jobs:
           2026,5,19,11,1,2,BlueBand,9500,15,4.9,1
           2026,5,20,12,2,3,UltraMilk,20000,10,4.8,8
           EOF
+          echo "--- VERIFIKASI FILE TERBUAT ---"
+          ls -la data/
 
       - name: 6. Stage 2 - Automated Training (train.py)
         run: |
