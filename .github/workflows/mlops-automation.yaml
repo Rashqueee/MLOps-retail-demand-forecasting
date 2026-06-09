@@ -34,11 +34,18 @@ jobs:
           mkdir -p data
           cat <<EOF > data/processed.csv
           Year,Month,Day,Hour,DayOfWeek,product_id,product_name,price,stock,rating,daily_demand
-          2026,5,18,16,0,1,Bogasari,10000,50,5.0,2
-          2026,5,18,17,0,1,Bogasari,10000,48,5.0,3
-          2026,5,19,10,1,2,BlueBand,9500,20,4.9,5
-          2026,5,19,11,1,2,BlueBand,9500,15,4.9,1
-          2026,5,20,12,2,3,UltraMilk,20000,10,4.8,8
+          2026,6,9,10,1,1820799809,EKONOMI P0WER LIQUID JRUK NIPIS POUCH 760 ML - SABUN CUCI PIRING,9100,269,4.9,0
+          2026,6,9,11,1,1820799809,EKONOMI P0WER LIQUID JRUK NIPIS POUCH 760 ML - SABUN CUCI PIRING,9100,269,4.9,0
+          2026,6,9,12,1,1820799809,EKONOMI P0WER LIQUID JRUK NIPIS POUCH 760 ML - SABUN CUCI PIRING,9100,268,4.9,1
+          2026,6,9,10,1,1820783878,Ultra UHT Cho 1000 Ml,21070,10,5.0,0
+          2026,6,9,11,1,1820783878,Ultra UHT Cho 1000 Ml,21070,9,5.0,1
+          2026,6,9,12,1,1820783878,Ultra UHT Cho 1000 Ml,21070,9,5.0,0
+          2026,6,9,10,1,1820749559,Bogasari Terigu Segitiga Biru 1 Kg,13260,56,5.0,1
+          2026,6,9,11,1,1820749559,Bogasari Terigu Segitiga Biru 1 Kg,13260,56,5.0,0
+          2026,6,9,12,1,1820749559,Bogasari Terigu Segitiga Biru 1 Kg,13260,54,5.0,2
+          2026,6,9,10,1,1820784664,VP Facial Tissue Kiloan 715 S,33400,153,5.0,0
+          2026,6,9,11,1,1820784664,VP Facial Tissue Kiloan 715 S,33400,153,5.0,0
+          2026,6,9,12,1,1820784664,VP Facial Tissue Kiloan 715 S,33400,153,5.0,0          
           EOF
           echo "--- VERIFIKASI FILE TERBUAT ---"
           ls -la data/
